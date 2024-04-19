@@ -1,0 +1,90 @@
+local score = 0 
+
+
+local function set_score(self) 
+	local s = gui.get_node("Score")
+	local level_number = tostring(((Height - 13)/2)+1)
+	
+	if not SCORE_FOUND then
+		score = tostring(math.floor((TOTAL_TIME/FINAL_TIME)*100)) 
+		--print("score calculated: ", TOTAL_TIME, FINAL_TIME)
+		print(FINAL_TIME)
+		SCORE_FOUND = true 
+	end
+	gui.set_text(s,"Your score for level " .. level_number ..  " is: ".. score)
+end
+
+local function game_over(self)
+	local s = gui.get_node("Score")
+	local level_number = tostring(((Height - 13)/2)+1)
+	gui.set_text(s,"Game over. You got to level " .. level_number)
+end
+local function show_node(node, show) 
+	local node_u = gui.get_node(node)
+	local from_colour = gui.get_color(node_u)
+	if show then 
+		from_colour.w=1
+	else 
+		from_colour.w=0
+	end
+	
+	gui.set_color(node_u, from_colour) 
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	
+	if message_id == hash("display menu") then
+		display_menu(true)
+		set_score()
+		msg.post("#", "acquire_input_focus")
+	end
+
+	if message_id == hash("display menu lost") then
+		display_menu(true)
+		game_over()
+		msg.post("#", "acquire_input_focus")
+	
+	end
+	if message_id == hash("display menu start") then
+		display_menu(true)
+		msg.post("#", "acquire_input_focus")
+
+	end
+
+end
+
+function on_input(self, action_id, action)
+	if action.pressed and gui.pick_node(gui.get_node("Play"), action.x, action.y) then
+		-- Change the button image to 'buttonPressed' when a user clicks the button
+		display_menu(false)
+		msg.post("#", "release_input_focus")
+		msg.post("main#Main Menu", "continue")
+	end
+	if action.pressed and gui.pick_node(gui.get_node("Quit"), action.x, action.y) then
+		-- Change the button image to 'buttonPressed' when a user clicks the button
+		display_menu(false)
+		msg.post("#", "release_input_focus")
+		sys.exit(0)
+	end
+end
+
+
+function display_menu(show)
+
+	show_node("Play",show)
+	show_node("Quit",show)
+	show_node("Title",show)
+	show_node("Score",show)
+	
+end
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Learn more: https://defold.com/manuals/hot-reload/
+	-- Remove this function if not needed
+end

@@ -1,0 +1,10 @@
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("Position Reset") then
+		go.set_position(vmath.vector3(222,(Height+3)*64,0))
+		
+
+	end
+end
+

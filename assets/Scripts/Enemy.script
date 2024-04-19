@@ -1,0 +1,132 @@
+
+local BASE_VELOCITY = 2.2
+function init(self)
+	self.velocity = vmath.vector3(0,0,0)
+	self.prevVelocity = {0,0}
+
+end
+function has_value (tab, val)
+	for index, value in pairs(tab) do
+		if value == val then
+			return true
+		end
+	end
+
+	return false
+end
+
+
+function camera_shake(pos1, pos2) 
+	local vector = pos1 - pos2
+	local distance = vmath.length(vector)
+	local max_intensity = 0.025
+	local used_intensity = 0 
+	if (max_intensity - (distance/20000))>0 then
+		used_intensity = (max_intensity - (distance/20000))
+	end	
+
+
+	msg.post("camera", "shake", { intensity = used_intensity , duration = 0.1, direction = "both" })
+end
+
+
+function update(self, dt)
+	if PLAYERSTARTED then 
+		print(COUNTDOWN)
+		if BRIGHT then 
+			COUNTDOWN = COUNTDOWN-(dt*3)
+		else
+			COUNTDOWN = COUNTDOWN-dt
+		end
+		
+		if COUNTDOWN < 0 and not ENEMYSTARTED then
+			--print(TOTAL_TIME)
+			--print(os.time() - START - TOTAL_TIME*1.4)
+			go.set_position(vmath.vector3(220,((Height+0.6)*64)+10,0))
+			ENEMYSTARTED = true
+			tilemap.set_tile("/level#level", "walls", 4, Height+2, 52)
+
+		end
+		if ENEMYSTARTED then
+			local target = go.get_position("/Main Character")
+			local pos = go.get_position()
+			local formatted_target = string.format("%d,%d",math.floor(target.y/64), math.floor(target.x/64))
+			local formatted_pos = string.format("%d,%d",math.floor(pos.y/64), math.floor(pos.x/64))
+
+			if formatted_target == formatted_pos or formatted_target == string.format("%d,%d", Height+2, 3) then
+				SHAKING = false
+				msg.post("camera", "stop_shaking")
+				msg.post("/main#Main Menu", "Game Over")
+			end
+
+			if has_value(G:vertices():enumerate(), formatted_target) and has_value(G:vertices():enumerate(), formatted_pos)  then
+
+				local Path = require("assets.Modules.AStar"):Generate(formatted_pos, formatted_target)
+				if #Path > 1 then
+					local dx = Path[2][2] - math.floor(pos.x/64)
+					local dy = Path[2][1] - math.floor(pos.y/64)
+					self.velocity.x = ((BASE_VELOCITY) * dx)
+					self.velocity.y = (BASE_VELOCITY * dy)
+				end	
+
+			elseif has_value(G:vertices():enumerate(), formatted_pos) then
+				local formatted_target = string.format("%d,%d",math.floor(PLAYER_PATH[#PLAYER_PATH-1][2]), math.floor(PLAYER_PATH[#PLAYER_PATH-1][1]))
+				local sub = 2
+				while not has_value(G:vertices():enumerate(), formatted_target) do 
+					formatted_target = string.format("%d,%d",math.floor(PLAYER_PATH[#PLAYER_PATH-sub][2]), math.floor(PLAYER_PATH[#PLAYER_PATH-sub][1]))
+					sub = sub + 1
+				end 
+				local Path = require("assets.Modules.AStar"):Generate(formatted_pos, formatted_target)
+				if #Path > 1 then
+					local dx = Path[2][2] - math.floor(pos.x/64)
+					local dy = Path[2][1] - math.floor(pos.y/64)
+					self.velocity.x = ((BASE_VELOCITY) * dx)
+					self.velocity.y = (BASE_VELOCITY * dy)
+				end
+			end
+			if SHAKING then
+				camera_shake(go.get_position("/Main Character"), go.get_position())
+			end
+		end
+
+
+	end
+end
+
+function fixed_update(self, dt)
+	local pos = go.get_position()
+	if self.prevVelocity[1] == 0 and self.velocity.x ~= 0 then
+		if self.prevVelocity[2] > 0 then
+			pos.y = pos.y + self.velocity.y +25
+
+		elseif self.prevVelocity[2] < 0 then
+			pos.y = pos.y + self.velocity.y -25
+		end
+		if self.velocity.x > 0 then
+			sprite.play_flipbook("#sprite", "Right Walk")
+		else
+			sprite.play_flipbook("#sprite", "Left Walk")
+		end
+	elseif self.prevVelocity[2] == 0 and self.velocity.y ~= 0 then
+		if self.prevVelocity[1] > 0 then
+			pos.x = pos.x + self.velocity.x +25
+		elseif self.prevVelocity[1] < 0 then 
+			pos.x = pos.x + self.velocity.x -25
+		end 
+		if self.velocity.y > 0 then
+			sprite.play_flipbook("#sprite", "Up Walk")
+		else
+			sprite.play_flipbook("#sprite", "Down Walk")
+		end
+	else
+		pos = pos + self.velocity
+	end
+
+	--self.prevVelocity = self.velocity
+	self.prevVelocity[1] = self.velocity.x
+	self.prevVelocity[2] = self.velocity.y
+	go.set_position(pos)
+	self.velocity.x = 0
+	self.velocity.y = 0
+end
+

@@ -1,0 +1,29 @@
+
+function init(self)
+
+	--sets default value to -1
+	self.prevposn = {-1,-1}
+	
+end
+
+
+
+function update(self, dt)
+	local posn = go.get_position()
+	FINAL_TIME = FINAL_TIME + dt
+	if not ((math.floor((posn.x+20)/64) == self.prevposn[1] or math.floor((posn.x-20)/64) == self.prevposn[1]) and (math.floor((posn.y+20)/64) == self.prevposn[2] or math.floor((posn.y-20)/64) == self.prevposn[2])) then
+		table.insert(PLAYER_PATH, {math.floor(posn.x/64),math.floor(posn.y/64)})	
+		self.prevposn = {math.floor(posn.x/64), math.floor(posn.y/64)}
+	end
+
+
+	if math.floor(posn.x/64) == Width and math.floor(posn.y/64) == 1 then
+		SHAKING = false
+		msg.post("camera", "stop_shaking")
+		msg.post("main#Main Menu", "Level Complete")
+		
+		
+	end
+	
+end
+

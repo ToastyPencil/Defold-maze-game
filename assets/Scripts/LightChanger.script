@@ -1,0 +1,25 @@
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("increase") then
+		if not BRIGHT then
+		
+			local yscale = go.get("#light", "scale.y")
+			go.set("#light", "scale.y", yscale *8)
+			local xscale = go.get("#light", "scale.x")
+			go.set("#light", "scale.x", xscale * 8)
+
+			BRIGHT = true
+		end
+	end
+	if message_id == hash("decrease") then
+		if BRIGHT then
+			local yscale = go.get("#light", "scale.y")
+			go.set("#light", "scale.y", yscale / 8)
+			local xscale = go.get("#light", "scale.x")
+			go.set("#light", "scale.x", xscale / 8)
+			BRIGHT = false
+		end
+	end
+end
+

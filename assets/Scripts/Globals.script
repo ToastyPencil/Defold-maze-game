@@ -1,0 +1,13 @@
+Height = 163
+Width = 163
+FINAL_TIME = 0
+PLAYER_PATH = {{}}
+TOTAL_TIME = 0
+COUNTDOWN = math.huge
+FIRST_RUN = true
+ENEMYSTARTED = false
+SCORE_FOUND = false
+SHAKING = true
+LOST = true
+BRIGHT = false
+PLAYERSTARTED = false

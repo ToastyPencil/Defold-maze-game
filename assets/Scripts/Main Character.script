@@ -1,0 +1,155 @@
+local BASE_VELOCITY = 100
+
+
+function init(self)
+	msg.post("#", "acquire_input_focus")
+	self.keypress = {
+		up = false,
+		down = false,
+		left= false,
+		right=false
+	}
+	self.velocity = vmath.vector3(0,0,0)
+	self.change = vmath.vector3(0,0,0)
+
+
+end
+
+
+function update(self,dt)
+	self.correction = vmath.vector3()
+
+
+
+end
+
+function fixed_update(self, dt)
+	local pos = go.get_position()
+	pos = pos + self.velocity  * dt
+	go.set_position(pos)
+	self.velocity.x = 0
+	self.velocity.y = 0
+end
+
+
+
+function walkLR(self, Direction)
+	self.velocity.x = BASE_VELOCITY * Direction
+end
+
+function walkUD(self, Direction)
+	self.velocity.y = BASE_VELOCITY * Direction 
+end
+
+function on_message(self, message_id, message, sender)
+	-- Handle collision
+	if message_id == hash("contact_point_response") then
+		if message.distance > 0 then
+			local projection = vmath.project(self.correction, message.normal * message.distance)
+			if projection < 1 then
+				local compensation = (message.distance - message.distance * projection) * message.normal
+				-- Apply compensation
+				go.set_position(go.get_position() + compensation)
+				-- Accumulate correction done
+				self.change = self.change + compensation
+			end
+		end
+	end
+end
+
+function on_input(self, action_id, action) 
+	if COUNTDOWN > 0 then
+		if action_id == hash("bright") and action.pressed then
+			msg.post("#LightChanger", "increase")
+		end
+
+		if action_id == hash("bright") and action.released then
+			msg.post("#LightChanger", "decrease")
+		end
+
+	else
+		if BRIGHT then
+			msg.post("#LightChanger", "decrease")
+		end
+	end
+
+	if action_id == hash("Up") and action.pressed then 
+		self.keypress.up = true
+		self.keypress.down = false
+		self.keypress.left = false
+		self.keypress.right = false
+
+		sprite.play_flipbook("#sprite", "Up Walk")
+
+	elseif action_id == hash("Down") and action.pressed then 
+		self.keypress.up = false
+		self.keypress.down = true
+		self.keypress.left = false
+		self.keypress.right = false
+		sprite.play_flipbook("#sprite", "Down Walk")
+		sprite.set_hflip("#sprite", false)
+
+	elseif action_id == hash("Left") and action.pressed then 
+		self.keypress.up = false
+		self.keypress.down = false
+		self.keypress.left = true
+		self.keypress.right = false
+		sprite.play_flipbook("#sprite", "Side Walk")
+		sprite.set_hflip("#sprite", false)
+
+	elseif action_id == hash("Right") and action.pressed then 
+		self.keypress.up = false
+		self.keypress.down = false
+		self.keypress.left = false
+		self.keypress.right = true
+		sprite.play_flipbook("#sprite", "Side Walk")
+		sprite.set_hflip("#sprite", true)
+
+	end
+
+	if self.keypress.up and action_id == hash("Up") and action.released then
+		self.keypress.up = false
+		sprite.play_flipbook("#sprite", "Up Idle")
+	elseif self.keypress.down and action_id == hash("Down") and action.released then
+		self.keypress.down = false
+		sprite.play_flipbook("#sprite", "Down Idle")
+	elseif self.keypress.right and action_id == hash("Right") and action.released then
+		self.keypress.right = false
+		sprite.play_flipbook("#sprite", "Side Idle")
+	elseif self.keypress.left and action_id == hash("Left") and action.released then
+		self.keypress.left = false
+		sprite.play_flipbook("#sprite", "Side Idle")
+
+	end 
+
+
+	if self.keypress.right and action_id == hash("Right") then
+		walkLR(self, 1)
+
+
+	elseif self.keypress.left and action_id == hash("Left")then
+		walkLR(self, -1)
+
+
+	elseif self.keypress.down and action_id == hash("Down") then
+		walkUD(self,-1)
+		if not PLAYERSTARTED then 
+			FINAL_TIME = 0
+			PLAYERSTARTED = true 
+		end
+
+
+	elseif self.keypress.up and action_id == hash("Up") then
+		walkUD(self, 1)
+	end
+
+
+
+end
+
+
+
+
+
+
+

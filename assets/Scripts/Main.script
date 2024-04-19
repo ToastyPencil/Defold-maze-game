@@ -1,0 +1,57 @@
+function init(self)
+
+	msg.post("camera", "follow", { target = hash("/Menu Panel"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+	msg.post("#Main_menu", "display menu start")
+	
+end
+
+
+
+local function RestartGame(lost) 
+	local clear = require("assets.Modules.LevelReset"):LevelReset()
+	if not lost then 
+		Height = Height + 2
+		Width = Width + 2
+	else
+		Height = 13
+		Width = 13
+	end
+	Start = string.format("%d,%d",3, Height-2)
+	Goal = string.format("%d,%d",Width-2, 3)
+	msg.post("Main Character#Main Character Reset", "Position Reset")
+	local Map = require("assets.Modules.TilePlacer"):TilePlacer(Height+2,Width+2)
+
+	local FastestPath = require("assets.Modules.AStar"):Generate(Start,Goal)
+	msg.post("Enemy", "enable")
+	msg.post("camera", "follow", { target = hash("/Main Character"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+	
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("Level Complete") then
+	
+		msg.post("camera", "unfollow", { target = hash("/Main Character"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+		msg.post("#Main_menu", "display menu")
+		msg.post("Enemy#Enemy Reset", "Position Reset")
+		msg.post("Enemy", "disable")
+		msg.post("camera", "follow", { target = hash("/Menu Panel"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+	end		
+	if message_id == hash("Game Over") then
+		LOST = true
+		msg.post("camera", "unfollow", { target = hash("/Main Character"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+		msg.post("#Main_menu", "display menu lost")
+		msg.post("Enemy#Enemy Reset", "Position Reset")
+		msg.post("Enemy", "disable")
+		msg.post("camera", "follow", { target = hash("/Menu Panel"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
+			
+		
+
+	end
+
+	if message_id == hash("continue") then
+		RestartGame(LOST)
+		print(Height, Width)
+	end
+end
+

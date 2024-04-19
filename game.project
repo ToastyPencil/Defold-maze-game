@@ -1,0 +1,40 @@
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /assets/render/MyOrthographic.renderc
+
+[script]
+shared_state = 1
+
+[display]
+width = 960
+height = 640
+vsync = 0
+update_frequency = 60
+
+[android]
+input_method = HiddenInputField
+
+[project]
+title = SCP-3008; Department Labyrinth
+dependencies#0 = https://github.com/britzl/defold-orthographic/archive/master.zip
+
+[physics]
+debug = 0
+max_collision_object_count = 30600
+max_collisions = 640
+max_contacts = 1280
+
+[tilemap]
+max_tile_count = 500000
+
+[graphics]
+max_debug_vertices = 1000000
+max_draw_calls = 1024000
+max_characters = 819200
+
+[html5]
+wasm_streaming = 0
+cssfile = /builtins/manifests/web/dark_theme.css
+heap_size = 512
+splash_image = /builtins/graphics/particle_blob.png
+

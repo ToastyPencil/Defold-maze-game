@@ -1,0 +1,5 @@
+script: "/assets/render/MyOrthographic.render_script"
+materials {
+  name: "lighting_quad"
+  material: "/assets/materials/quad.material"
+}
