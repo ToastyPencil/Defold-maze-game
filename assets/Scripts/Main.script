@@ -2,6 +2,7 @@ function init(self)
 
 	msg.post("camera", "follow", { target = hash("/Menu Panel"), lerp = 0.7, horizontal = true, vertical = true, immediate = true })
 	msg.post("#Main_menu", "display menu start")
+	DISPLAY_MENU = false
 	
 end
 

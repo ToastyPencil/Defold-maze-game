@@ -18,7 +18,7 @@ function clear:LevelReset()
 	Goal = string.format("%d,%d",Width-2, 3)
 	FIRST_RUN = false
 	ENEMYSTARTED = false
-	SCORE_FOUND = false
+	MENU_DISPLAYED = false
 	SHAKING = true
 	LOST = false
 	PreviousPaths = {{}}
