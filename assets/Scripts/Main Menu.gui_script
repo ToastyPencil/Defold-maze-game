@@ -7,8 +7,6 @@ local function set_score(self)
 	
 	if not SCORE_FOUND then
 		score = tostring(math.floor((TOTAL_TIME/FINAL_TIME)*100)) 
-		--print("score calculated: ", TOTAL_TIME, FINAL_TIME)
-		print(FINAL_TIME)
 		SCORE_FOUND = true 
 	end
 	gui.set_text(s,"Your score for level " .. level_number ..  " is: ".. score)

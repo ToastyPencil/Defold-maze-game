@@ -32,7 +32,6 @@ end
 
 function update(self, dt)
 	if PLAYERSTARTED then 
-		print(COUNTDOWN)
 		if BRIGHT then 
 			COUNTDOWN = COUNTDOWN-(dt*3)
 		else
@@ -40,8 +39,6 @@ function update(self, dt)
 		end
 		
 		if COUNTDOWN < 0 and not ENEMYSTARTED then
-			--print(TOTAL_TIME)
-			--print(os.time() - START - TOTAL_TIME*1.4)
 			go.set_position(vmath.vector3(220,((Height+0.6)*64)+10,0))
 			ENEMYSTARTED = true
 			tilemap.set_tile("/level#level", "walls", 4, Height+2, 52)

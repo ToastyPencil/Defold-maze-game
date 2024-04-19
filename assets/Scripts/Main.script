@@ -51,7 +51,6 @@ function on_message(self, message_id, message, sender)
 
 	if message_id == hash("continue") then
 		RestartGame(LOST)
-		print(Height, Width)
 	end
 end
 
